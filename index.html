@@ -98,13 +98,22 @@ select:focus-visible, textarea:focus-visible {
 
 .layout { display: flex; min-height: calc(100vh - 70px); }
 
+
 .sidebar {
   width: 215px;
   flex-shrink: 0;
   background: white;
   border-right: 1px solid var(--line);
   padding: 20px 12px;
+
+  /* Keep the sidebar visible while scrolling */
+  position: sticky;
+  top: 70px;
+  height: calc(100vh - 70px);
+  align-self: flex-start;
+  overflow-y: auto;
 }
+
 
 .nav-label {
   color: var(--muted);
