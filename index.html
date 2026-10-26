@@ -41,7 +41,21 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+
+  /* Film set photograph with a soft green tint */
+  background-color: #204b38;
+  background-image:
+    linear-gradient(
+      rgba(32, 75, 56, 0.86),
+      rgba(32, 75, 56, 0.86)
+    ),
+    url("https://images.pexels.com/photos/8088381/pexels-photo-8088381.jpeg?auto=compress&cs=tinysrgb&w=2000");
+
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+
   color: var(--ink);
   font: 15px/1.5 system-ui, -apple-system, sans-serif;
 }
@@ -2044,5 +2058,11 @@ initApp();
 
 
 </div>
+  <p style="text-align:center; font-size:11px; color:#dce7dd; padding:12px;">
+  Background photograph by
+  <a href="https://www.pexels.com/photo/a-cameraman-working-on-set-8088381/"
+     target="_blank" rel="noopener noreferrer"
+     style="color:inherit;">Ron Lach / Pexels</a>
+</p>
 </body>
 </html>
