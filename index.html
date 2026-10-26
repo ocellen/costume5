@@ -200,6 +200,20 @@ p { margin: 0; }
   background: #edf4ed;
   display: block;
 }
+  
+.detail-photo {
+  width: 100%;
+  max-height: 380px;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #edf4ed;
+  border-radius: 12px;
+}
+
 .metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -586,7 +600,7 @@ textarea:focus-visible {
       <option>Retired</option>
     </select>
     <button class="btn primary" onclick="openScanner('inventory')">
-      ▦ Scan barcode
+      ▥ Scan barcode
     </button>
   </div>
   <p id="inventoryCount" class="muted small" style="margin-bottom:12px"></p>
@@ -628,7 +642,7 @@ textarea:focus-visible {
     </div>
     <div class="progress"><span id="dispatchProgress" style="width:0%"></span></div>
     <div id="dispatchList"></div>
-    <button class="btn" onclick="openScanner('dispatch')">▦ Scan an item</button>
+    <button class="btn" onclick="openScanner('dispatch')">▥ Scan an item</button>
     <div class="rule"></div>
     <div class="field">
       <label for="dispatchDate">Actual dispatch date</label>
@@ -640,7 +654,7 @@ textarea:focus-visible {
     </div>
     <button id="dispatchConfirm" class="btn primary full"
       onclick="confirmDispatch()">Confirm simulated dispatch</button>
-    <div id="dispatchMessage" aria-live="polite"></div>
+    <div id="dispatchMessage" arialive="polite"></div>
   </div>
 </section>
 
@@ -655,7 +669,7 @@ textarea:focus-visible {
 
   <div class="card stack">
     <div class="scan-box">
-      <div style="font-size:30px">▦</div>
+      <div style="font-size:30px">▥</div>
       <div class="flex1">
         <strong>Identify returned costume</strong>
         <p class="muted small">Select a record or simulate a barcode scan.</p>
@@ -770,12 +784,18 @@ textarea:focus-visible {
   </div>
   <div class="columns">
     <div class="card stack">
-      <div style="font-size:45px;text-align:center;padding:20px;background:#f0f2f5;border-radius:12px">♜</div>
+      <img
+  id="detailImage"
+  class="detail-photo"
+  src=""
+  alt="Costume item"
+  onerror="this.style.display='none';"
+>
       <div id="detailStatus"></div>
       <h3>Item information</h3>
       <div id="detailInfo" class="stack"></div>
       <button class="btn primary full" onclick="goInspect()">Inspect return</button>
-      <button class="btn full" onclick="openScanner('detail')">▦ Simulate barcode scan</button>
+      <button class="btn full" onclick="openScanner('detail')">▥ Simulate barcode scan</button>
     </div>
     <div class="card">
       <h3>Condition history</h3>
@@ -795,7 +815,7 @@ textarea:focus-visible {
   </div>
   <div class="card stack">
     <div style="text-align:center;padding:15px">
-      <div style="font-size:50px">▦</div>
+      <div style="font-size:50px">▥</div>
       <h3>Barcode lookup</h3>
       <p class="muted small" style="margin-top:7px">
         Example: CST-00124
@@ -1712,6 +1732,17 @@ function openDetail(id) {
   if (!i) return;
 
   selectedItemId = id;
+
+  const detailImage = document.getElementById("detailImage");
+
+  detailImage.style.display = i.image ? "block" : "none";
+  detailImage.alt = i.name;
+
+  if (i.image) {
+    detailImage.src = i.image;
+  } else {
+    detailImage.removeAttribute("src");
+  }
 
   document.getElementById("detailTitle").textContent = i.name;
   document.getElementById("detailSubtitle").textContent =
