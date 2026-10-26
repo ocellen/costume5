@@ -301,6 +301,38 @@ textarea { min-height: 85px; resize: vertical; }
 .b-neutral { background: #edf0f4; color: #596578; }
 
 .record-list { display: grid; gap: 9px; }
+  
+.inventory-record-group {
+  display: grid;
+  gap: 0;
+}
+
+.inventory-record-group .record {
+  border-radius: 13px 13px 0 0;
+}
+
+.inventory-ready {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 13px;
+  margin-bottom: 9px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 13px 13px;
+  font-size: 12px;
+  color: var(--green);
+}
+
+.inventory-ready input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--green);
+  flex-shrink: 0;
+}
+
 .record {
   display: flex;
   align-items: center;
@@ -1341,6 +1373,7 @@ function renderOverview() {
 
 /* INVENTORY */
 
+
 function renderInventory() {
   const query = (
     document.getElementById("inventorySearch").value || ""
@@ -1360,28 +1393,73 @@ function renderInventory() {
     `${results.length} matching records · ${inventory.length} total sample items`;
 
   document.getElementById("inventoryList").innerHTML =
-    results.length ? results.map(i => `
-      <div class="record">
-        <img
-  class="item-photo"
-  src="${esc(i.image)}"
-  alt="${esc(i.name)}"
-  loading="lazy"
-  onerror="this.style.display='none'"
->
-        <div class="record-main">
-          <div class="record-title">${esc(i.name)}</div>
-          <div class="record-meta">${esc(i.id)} · ${esc(i.category)}</div>
-          <div class="record-meta">Size ${esc(i.size)} · ${esc(i.location)}</div>
+    results.length ? results.map(i => {
+      const canMarkReady =
+        i.status === "Cleaning" || i.status === "Repair";
+
+      return `
+        <div class="inventory-record-group">
+          <div class="record">
+            <img
+              class="item-photo"
+              src="${esc(i.image || '')}"
+              alt="${esc(i.name)}"
+              loading="lazy"
+              onerror="this.style.display='none'"
+            >
+            <div class="record-main">
+              <div class="record-title">${esc(i.name)}</div>
+              <div class="record-meta">
+                ${esc(i.id)} · ${esc(i.category)}
+              </div>
+              <div class="record-meta">
+                Size ${esc(i.size)} · ${esc(i.location)}
+              </div>
+            </div>
+            <div class="record-side">
+              ${statusBadge(i.status)}
+              <button class="btn sm"
+                onclick="openDetail('${i.id}')">Details</button>
+            </div>
+          </div>
+
+          ${canMarkReady ? `
+            <label class="inventory-ready">
+              <input type="checkbox"
+                onchange="markItemReady('${i.id}', this.checked)">
+              <span>Item checked and ready to make available again</span>
+            </label>
+          ` : ""}
         </div>
-        <div class="record-side">
-          ${statusBadge(i.status)}
-          <button class="btn sm" onclick="openDetail('${i.id}')">Details</button>
-        </div>
-      </div>
-    `).join("") :
+      `;
+    }).join("") :
     `<div class="card empty">No matching costume records found.</div>`;
 }
+
+function markItemReady(id, checked) {
+  if (!checked) return;
+
+  const item = itemById(id);
+  if (!item) return;
+
+  // Only cleaning or repair items can be released this way.
+  if (!["Cleaning", "Repair"].includes(item.status)) {
+    showToast("This item is not eligible to be marked ready.");
+    renderInventory();
+    return;
+  }
+
+  item.status = "Available";
+  item.location = "Rack — ready for hire";
+  item.due = "";
+
+  renderInventory();
+  renderOverview();
+  renderBookings();
+
+  showToast(`${item.name} is now marked Available.`);
+}
+
 
 /* BOOKINGS */
 
